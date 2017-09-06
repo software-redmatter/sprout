@@ -207,9 +207,50 @@ static void sas_log_rx_msg(pjsip_rx_data* rdata)
   {
     PJUtils::report_sas_to_from_markers(trail, rdata->msg_info.msg);
 
+    std::vector<std::string> call_ids;
+
     pjsip_cid_hdr* cid = (pjsip_cid_hdr*)rdata->msg_info.cid;
 
-    PJUtils::mark_sas_call_branch_ids(trail, cid, rdata->msg_info.msg);
+    if (cid != NULL)
+    {
+      call_ids.push_back(PJUtils::pj_str_to_string(&cid->id));
+    }
+
+    // If this is a SIP MESSAGE then also pull out any In-Reply-To
+    // headers in order to correlate this trail with the trails
+    // for the calls identified in those headers.
+    pjsip_method* method = &rdata->msg_info.msg->line.req.method;
+
+    if ((method->id == PJSIP_OTHER_METHOD) &&
+        (pj_strcmp2(&method->name, "MESSAGE") == 0))
+    {
+      TRC_DEBUG("MESSAGE method - pull out In-Reply-To headers");
+      pjsip_in_reply_to_hdr* inreplyto;
+
+      for (inreplyto = (pjsip_in_reply_to_hdr*)pjsip_msg_find_hdr_by_name(rdata->msg_info.msg,
+                                                                          &STR_IN_REPLY_TO,
+                                                                          NULL);
+           inreplyto != NULL;
+           inreplyto = (pjsip_in_reply_to_hdr*)pjsip_msg_find_hdr_by_name(rdata->msg_info.msg,
+                                                                          &STR_IN_REPLY_TO,
+                                                                          inreplyto->next))
+      {
+        TRC_DEBUG("Found In-Reply-To header %.*s", inreplyto->hvalue.slen, inreplyto->hvalue.ptr);
+
+        // Split the header value by commas. Each resulting value is a Call-ID.
+        std::vector<std::string> inreplyto_call_ids;
+        Utils::split_string(PJUtils::pj_str_to_string(&inreplyto->hvalue),
+                            ',',
+                            inreplyto_call_ids);
+
+        // Append to list of all Call-IDs found so far.
+        call_ids.insert(call_ids.end(),
+                        inreplyto_call_ids.begin(),
+                        inreplyto_call_ids.end());
+      }
+    }
+
+    PJUtils::mark_sas_call_branch_ids(trail, call_ids, rdata->msg_info.msg);
   }
 
   // Log the message event.
@@ -239,8 +280,9 @@ static void sas_log_tx_msg(pjsip_tx_data *tdata)
     if (tdata->msg->type == PJSIP_REQUEST_MSG)
     {
       PJUtils::report_sas_to_from_markers(trail, tdata->msg);
+      std::vector<std::string> empty_vector;
 
-      PJUtils::mark_sas_call_branch_ids(trail, NULL, tdata->msg);
+      PJUtils::mark_sas_call_branch_ids(trail, empty_vector, tdata->msg);
     }
 
     // Log the message event.

@@ -1242,7 +1242,8 @@ pj_status_t PJUtils::send_request(pjsip_tx_data* tdata,
     set_trail(tsx, get_trail(tdata));
     if (log_sas_branch)
     {
-      PJUtils::mark_sas_call_branch_ids(get_trail(tdata), NULL, tdata->msg);
+      std::vector<std::string> empty_vector;
+      PJUtils::mark_sas_call_branch_ids(get_trail(tdata), empty_vector, tdata->msg);
     }
 
     // Set up the module data for the new transaction to reference
@@ -1671,8 +1672,9 @@ std::string PJUtils::get_header_value(pjsip_hdr* header)
   return std::string(buf2, len);
 }
 
-/// Add SAS markers for the specified call ID and branch IDs on the message (call ID may be omitted, but not message).
-void PJUtils::mark_sas_call_branch_ids(const SAS::TrailId trail, pjsip_cid_hdr* cid_hdr, pjsip_msg* msg)
+/// Add SAS markers for the specified call IDs and branch IDs on the message
+// (call IDs may be empty; msg must not be NULL).
+void PJUtils::mark_sas_call_branch_ids(const SAS::TrailId trail, const std::vector<std::string>& cids, pjsip_msg* msg)
 {
   // Decide whether this is a message where we want to correlate on Call-ID or branch ID
   //
@@ -1693,11 +1695,14 @@ void PJUtils::mark_sas_call_branch_ids(const SAS::TrailId trail, pjsip_cid_hdr* 
                                  (pjsip_method_cmp(&msg->line.req.method, pjsip_get_subscribe_method()) == 0) ||
                                  (pjsip_method_cmp(&msg->line.req.method, pjsip_get_notify_method()) == 0)));
 
-  if (cid_hdr != NULL)
+  for (std::vector<std::string>::const_iterator it = cids.begin();
+       it != cids.end();
+       it++)
   {
-    TRC_DEBUG("Logging SAS Call-ID marker, Call-ID %.*s", cid_hdr->id.slen, cid_hdr->id.ptr);
+    std::string cid = *it;
+    TRC_DEBUG("Logging SAS Call-ID marker, Call-ID %s", cid.c_str());
     SAS::Marker cid_marker(trail, MARKER_ID_SIP_CALL_ID, 1u);
-    cid_marker.add_var_param(cid_hdr->id.slen, cid_hdr->id.ptr);
+    cid_marker.add_var_param(cid.size(), (char*)cid.c_str());
     SAS::report_marker(cid_marker, branch_id_correlation ? SAS::Marker::Scope::None : SAS::Marker::Scope::Trace);
   }
 
