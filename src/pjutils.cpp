@@ -1242,8 +1242,7 @@ pj_status_t PJUtils::send_request(pjsip_tx_data* tdata,
     set_trail(tsx, get_trail(tdata));
     if (log_sas_branch)
     {
-      std::vector<std::string> empty_vector;
-      PJUtils::mark_sas_call_branch_ids(get_trail(tdata), empty_vector, tdata->msg);
+      PJUtils::mark_sas_call_branch_ids(get_trail(tdata), tdata->msg);
     }
 
     // Set up the module data for the new transaction to reference
@@ -1672,9 +1671,8 @@ std::string PJUtils::get_header_value(pjsip_hdr* header)
   return std::string(buf2, len);
 }
 
-/// Add SAS markers for the specified call IDs and branch IDs on the message
-// (call IDs may be empty; msg must not be NULL).
-void PJUtils::mark_sas_call_branch_ids(const SAS::TrailId trail, const std::vector<std::string>& cids, pjsip_msg* msg)
+/// Add SAS markers for the specified call IDs and branch IDs on the message (msg must not be NULL).
+void PJUtils::mark_sas_call_branch_ids(const SAS::TrailId trail, pjsip_msg* msg, const std::vector<std::string>& cids)
 {
   // Decide whether this is a message where we want to correlate on Call-ID or branch ID
   //

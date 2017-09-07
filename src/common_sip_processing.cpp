@@ -250,7 +250,7 @@ static void sas_log_rx_msg(pjsip_rx_data* rdata)
       }
     }
 
-    PJUtils::mark_sas_call_branch_ids(trail, call_ids, rdata->msg_info.msg);
+    PJUtils::mark_sas_call_branch_ids(trail, rdata->msg_info.msg, call_ids);
   }
 
   // Log the message event.
@@ -280,9 +280,7 @@ static void sas_log_tx_msg(pjsip_tx_data *tdata)
     if (tdata->msg->type == PJSIP_REQUEST_MSG)
     {
       PJUtils::report_sas_to_from_markers(trail, tdata->msg);
-      std::vector<std::string> empty_vector;
-
-      PJUtils::mark_sas_call_branch_ids(trail, empty_vector, tdata->msg);
+      PJUtils::mark_sas_call_branch_ids(trail, tdata->msg);
     }
 
     // Log the message event.
