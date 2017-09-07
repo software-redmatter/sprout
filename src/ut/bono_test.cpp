@@ -60,8 +60,9 @@ public:
                             const string& icscf_uri_str = "",
                             bool emerg_reg_enabled = false)
   {
+    printf("Starting setup\n");
     SipTest::SetUpTestCase();
-
+    printf("set up siptest done\n");
     _chronos_connection = new FakeChronosConnection();
     _local_data_store = new LocalStore();
     _local_aor_store = new AstaireAoRStore(_local_data_store);
@@ -85,6 +86,7 @@ public:
     _scscf = scscf_enabled;
     _emerg_reg = emerg_reg_enabled;
     _acr_factory = new ACRFactory();
+    printf("created test stuff. init stateful proxy\n");
     pj_status_t ret = init_stateful_proxy(_sdm,
                                           NULL,
                                           _ifc_handler,
@@ -110,13 +112,18 @@ public:
                                           _scscf,
                                           _emerg_reg);
     ASSERT_EQ(PJ_SUCCESS, ret) << PjStatus(ret);
+    printf("created stateful proxy. run poll\n");
 
     // Schedule timers.
     SipTest::poll();
+    printf("poll() finished\n");
+
   }
 
   static void TearDownTestCase()
   {
+    printf("starting tear down.\n");
+
     // Shut down the transaction module first, before we destroy the
     // objects that might handle any callbacks!
     pjsip_tsx_layer_destroy();
@@ -132,11 +139,13 @@ public:
     delete _xdm_connection; _xdm_connection = NULL;
     delete _enum_service; _enum_service = NULL;
     delete _bgcf_service; _bgcf_service = NULL;
+    printf("Calling siptest teardown\n");
     SipTest::TearDownTestCase();
   }
 
   StatefulProxyTestBase()
   {
+    printf("construct statefulproxytestbase\n");
     _log_traffic = PrintingTestLogger::DEFAULT.isPrinting(); // true to see all traffic
     _local_data_store->flush_all();  // start from a clean slate on each test
     if (_hss_connection)
@@ -151,6 +160,7 @@ public:
 
   ~StatefulProxyTestBase()
   {
+    printf("destruct test base\n");
     for (map<string,pjsip_tx_data*>::iterator it = _tdata.begin();
          it != _tdata.end();
          ++it)
@@ -159,6 +169,7 @@ public:
     }
 
     pjsip_tsx_layer_dump(true);
+    printf("terminate transactions\n");
 
     // Terminate all transactions
     list<pjsip_transaction*> tsxs = get_all_tsxs();
@@ -168,6 +179,7 @@ public:
     {
       pjsip_tsx_terminate(*it2, PJSIP_SC_SERVICE_UNAVAILABLE);
     }
+    printf("terminate done\n");
 
     // PJSIP transactions aren't actually destroyed until a zero ms
     // timer fires (presumably to ensure destruction doesn't hold up
@@ -175,12 +187,16 @@ public:
     // Allow a good length of time to pass too, in case we have
     // transactions still open. 32s is the default UAS INVITE
     // transaction timeout, so we go higher than that.
+    printf("advance time and poll\n");
+
     cwtest_advance_time_ms(33000L);
     poll();
+    printf("done\n");
 
     // Stop and restart the layer just in case
     pjsip_tsx_layer_instance()->stop();
     pjsip_tsx_layer_instance()->start();
+    printf("tsx layer stop started\n");
 
   }
 
@@ -240,6 +256,7 @@ class StatefulEdgeProxyTest : public StatefulProxyTestBase
 public:
   static void SetUpTestCase()
   {
+    printf("setup test case in state edge proxy test\n");
     StatefulProxyTestBase::SetUpTestCase("upstreamnode", "", "", "", false);
     add_host_mapping("upstreamnode", "10.6.6.8");
   }
@@ -251,6 +268,7 @@ public:
 
   StatefulEdgeProxyTest()
   {
+    printf("constructor state edge proxy test\n");
   }
 
   ~StatefulEdgeProxyTest()
