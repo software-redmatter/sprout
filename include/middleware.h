@@ -12,8 +12,10 @@
 #ifndef MIDDLEWARE_H__
 #define MIDDLEWARE_H__
 
-// TODO - Delete
-//
+extern "C" {
+#include <pjsip.h>
+}
+
 #include "sproutlet.h"
 
 /// The Middleware class is a base-class designed to be extended by any class
@@ -36,6 +38,10 @@
 /// we really ought to return copies of this when original_request() is later
 /// called.  Seems like this would be easy to get wrong when writing a new
 /// middleware layer that modifies initial requests...
+///
+/// TODO - I've repeated the comments from sproutlet.h against each of the
+/// methods from the SproutletTsx and SproutletTsxHelper interfaces.  Probably
+/// shouldn't do that.
 class Middleware : public SproutletTsx, SproutletTsxHelper
 {
 public:
@@ -388,7 +394,7 @@ public:
   virtual std::string get_local_hostname(const pjsip_sip_uri* uri) const override
                                    { return _helper->get_local_hostname(uri); }
 
-private:
+protected:
   Sproutlet* _sproutlet;
   SproutletTsx* _sproutlet_tsx;
 };
