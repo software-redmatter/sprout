@@ -9,6 +9,9 @@
  * Metaswitch Networks in a separate written agreement.
  */
 
+// TODO - Need to delete authenticationsproutlet.h, from which much of this
+// file is taken.
+
 #ifndef AUTH_MIDDLEWARE_H__
 #define AUTH_MIDDLEWARE_H__
 
