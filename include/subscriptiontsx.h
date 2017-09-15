@@ -68,7 +68,7 @@ private:
 };
 
 
-class SubscriptionTsx
+class SubscriptionTsx : public SproutletTsx
 {
 public:
   SubscriptionTsx(SubscriptionProvider* subscription,
