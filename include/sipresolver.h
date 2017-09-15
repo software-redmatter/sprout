@@ -23,14 +23,12 @@ public:
   {
   }
 
+  /// This constructor is called when graylisting is desired but we don't want
+  /// to set a specific duration.
   SIPResolver(DnsCachedResolver* dns_client,
               int blacklist_duration)
     : SIPResolver(dns_client, blacklist_duration, blacklist_duration)
   {
-    // Graylist duration is not configurable so it defaults to whatever the
-    // blacklist duration has been set to. This is desirable since if there is a
-    // need to increase graylist duration, eg low call load, this also means
-    // blacklist duration should increase.
   }
 
   SIPResolver(DnsCachedResolver* dns_client,
