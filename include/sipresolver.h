@@ -18,9 +18,24 @@
 class SIPResolver : public BaseResolver
 {
 public:
+  SIPResolver(DnsCachedResolver* dns_client)
+    : SIPResolver(dns_client, DEFAULT_BLACKLIST_DURATION)
+  {
+  }
+
   SIPResolver(DnsCachedResolver* dns_client,
-              int blacklist_duration = DEFAULT_BLACKLIST_DURATION,
-              int graylist_duration = DEFAULT_GRAYLIST_DURATION);
+              int blacklist_duration)
+    : SIPResolver(dns_client, blacklist_duration, blacklist_duration)
+  {
+    // Graylist duration is not configurable so it defaults to whatever the
+    // blacklist duration has been set to. This is desirable since if there is a
+    // need to increase graylist duration, eg low call load, this also means
+    // blacklist duration should increase.
+  }
+
+  SIPResolver(DnsCachedResolver* dns_client,
+              int blacklist_duration,
+              int graylist_duration);
   ~SIPResolver();
 
   void resolve(const std::string& name,

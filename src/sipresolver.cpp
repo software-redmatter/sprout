@@ -42,9 +42,7 @@ SIPResolver::~SIPResolver()
   destroy_srv_cache();
   destroy_naptr_cache();
 }
-
-/// Wrapper for resolve_iter. Converts the iterator to a vector and stores that
-/// in targets.
+/// Functionality moved to resolve_iter, converts that result back to a vector.
 void SIPResolver::resolve(const std::string& name,
                           int af,
                           int port,
@@ -102,8 +100,8 @@ BaseAddrIterator* SIPResolver::resolve_iter(const std::string& name,
     TRC_DEBUG("Target is an IP address - default port/transport if required");
 
     // Creates an empty vector to contain the targets, which will contain only
-    // this address if the address' host state is allowed, and be empty
-    // otherwise. An iterator to this vector will be returned.
+    // this address if the address is allowed, and be empty otherwise. An
+    // iterator to this vector will be returned.
     std::vector<AddrInfo> targets;
 
     // Check which host states are permitted.
@@ -338,7 +336,6 @@ BaseAddrIterator* SIPResolver::resolve_iter(const std::string& name,
       targets_iter = a_resolve_iter(a_name, af, port, transport, dummy_ttl, trail, allowed_host_state);
     }
   }
-
   return targets_iter;
 }
 
