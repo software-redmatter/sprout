@@ -31,7 +31,7 @@
 
 class RegistrarTsx;
 
-class RegistrarProvider
+class RegistrarProvider : public TsxProvider
 {
 public:
   RegistrarProvider(SubscriberDataManager* reg_sdm,
@@ -46,7 +46,13 @@ public:
                     IFCConfiguration ifc_configuration);
   ~RegistrarProvider();
 
-  bool init();
+  bool init() override;
+  SproutletTsx* get_tsx(SproutletHelper* helper,
+                        const std::string& alias,
+                        pjsip_msg* req,
+                        pjsip_sip_uri*& next_hop,
+                        pj_pool_t* pool,
+                        SAS::TrailId trail) override;
 
   int expiry_for_binding(pjsip_contact_hdr* contact,
                          pjsip_expires_hdr* expires);

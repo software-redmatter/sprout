@@ -67,7 +67,13 @@ public:
                      AsCommunicationTracker* sess_cont_as_tracker = NULL);
   ~SCSCFProxyProvider();
 
-  bool init();
+  bool init() override;
+  SproutletTsx* get_tsx(SproutletHelper* helper,
+                        const std::string& alias,
+                        pjsip_msg* req,
+                        pjsip_sip_uri*& next_hop,
+                        pj_pool_t* pool,
+                        SAS::TrailId trail) override;
 
   // Methods used to change the values of internal configuration during unit
   // test.

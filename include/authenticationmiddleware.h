@@ -74,7 +74,7 @@ public:
   int akaversion;
 };
 
-class AuthenticationProvider
+class AuthenticationProvider : public MiddlewareProvider
 {
 public:
   AuthenticationProvider(const std::string& realm_name,
@@ -90,7 +90,14 @@ public:
                          get_expiry_for_binding_fn get_expiry_for_binding_arg);
   ~AuthenticationProvider();
 
-  bool init();
+  bool init() override;
+  SproutletTsx* get_tsx(SproutletTsx* sproutlet_tsx,
+                        SproutletHelper* helper,
+                        const std::string& alias,
+                        pjsip_msg* req,
+                        pjsip_sip_uri*& next_hop,
+                        pj_pool_t* pool,
+                        SAS::TrailId trail) override;
 
 private:
   bool needs_authentication(pjsip_msg* req,

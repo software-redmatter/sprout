@@ -51,16 +51,19 @@ public:
                  const std::string& uri,
                  SNMP::SuccessFailCountByRequestTypeTable* incoming_sip_transactions_tbl,
                  SNMP::SuccessFailCountByRequestTypeTable* outgoing_sip_transactions_tbl,
-                 AuthenticationProvider* authentication_provider,
-                 RegistrarProvider* registrar_provider,
-                 SubscriptionProvider* subscription_provider,
-                 SCSCFProxyProvider* scscf_proxy_provider);
+                 std::list<TsxProvider> tsx_providers,
+                 std::list<MiddlewareProvider> middleware_providers);
   ~SCSCFSproutlet();
 
   bool init();
 
   // TODO - Needs to return either RegistrarTsx, SubscriptionTsx or
-  // SCSCFProxyTsx, depending on context.
+  // SCSCFProxyTsx, depending on context.  This must be wrapped in an
+  // AuthenticationMiddleware layer.
+  //
+  // This can be done by:
+  //  - Calling tsx_from_providers() to get an appropriate SproutletTsx
+  //  - Calling add_middleware() to wrap the SproutletTsx in Middleware layers
   SproutletTsx* get_tsx(SproutletHelper* helper,
                         const std::string& alias,
                         pjsip_msg* req,

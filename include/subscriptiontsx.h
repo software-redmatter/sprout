@@ -41,7 +41,13 @@ public:
                        int cfg_max_expires);
   ~SubscriptionProvider();
 
-  bool init();
+  bool init() override;
+  SproutletTsx* get_tsx(SproutletHelper* helper,
+                        const std::string& alias,
+                        pjsip_msg* req,
+                        pjsip_sip_uri*& next_hop,
+                        pj_pool_t* pool,
+                        SAS::TrailId trail) override;
 
 private:
   bool handle_request(pjsip_msg* req,
