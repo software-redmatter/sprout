@@ -225,7 +225,7 @@ pj_status_t SIPConnectionPool::create_connection(int hash_slot)
 
   // Register for transport state callbacks.
   pjsip_tp_state_listener_key* key;
-  status = pjsip_transport_add_state_listener(tp, &transport_state, (void*)this, &key);
+  pjsip_transport_add_state_listener(tp, &transport_state, (void*)this, &key);
 
   // Store the new transport in the hash slot, but marked as disconnected.
   pthread_mutex_lock(&_tp_hash_lock);

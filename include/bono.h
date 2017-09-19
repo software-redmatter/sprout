@@ -187,19 +187,6 @@ private:
                                TargetList& targets,
                                int max_targets,
                                SAS::TrailId trail);
-  void get_targets_from_store(const std::string& aor,
-                              SubscriberDataManager*& sdm,
-                              SubscriberDataManager*& remote_sdm,
-                              pjsip_msg*& msg,
-                              pj_pool_t* pool,
-                              int max_targets,
-                              TargetList& targets,
-                              SAS::TrailId trail);
-  void get_all_bindings(const std::string& aor,
-                        SubscriberDataManager*& sdm,
-                        SubscriberDataManager*& remote_sdm,
-                        AoR** aor_data,
-                        SAS::TrailId trail);
 
   void cancel_trying_timer();
 
@@ -326,10 +313,7 @@ private:
   static const int LIVENESS_TIMER = 1;
 };
 
-pj_status_t init_stateful_proxy(SubscriberDataManager* sdm,
-                                SubscriberDataManager* remote_sdm,
-                                IfcHandler* ifc_handler,
-                                pj_bool_t enable_access_proxy,
+pj_status_t init_stateful_proxy(pj_bool_t enable_access_proxy,
                                 const std::string& upstream_proxy,
                                 int upstream_proxy_port,
                                 int upstream_proxy_connections,

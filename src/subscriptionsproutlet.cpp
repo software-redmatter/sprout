@@ -215,14 +215,6 @@ void SubscriptionSproutletTsx::process_subscription_request(pjsip_msg* req)
 
   // Get the URI from the To header and check it is a SIP or SIPS URI.
   pjsip_uri* uri = (pjsip_uri*)pjsip_uri_get_uri(PJSIP_MSG_TO_HDR(req)->uri);
-  pjsip_expires_hdr* expires = (pjsip_expires_hdr*)pjsip_msg_find_hdr(req, PJSIP_H_EXPIRES, NULL);
-  int expiry = (expires != NULL) ? expires->ivalue : SubscriptionSproutlet::DEFAULT_SUBSCRIPTION_EXPIRES;
-
-  if (expiry > _subscription->_max_expires)
-  {
-    // Expiry is too long, set it to the maximum.
-    expiry = _subscription->_max_expires;
-  }
 
   if ((!PJSIP_URI_SCHEME_IS_SIP(uri)) && (!PJSIP_URI_SCHEME_IS_TEL(uri)))
   {

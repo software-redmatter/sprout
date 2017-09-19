@@ -102,11 +102,6 @@ extern "C" {
 #include "contact_filtering.h"
 #include "uri_classifier.h"
 
-static SubscriberDataManager* sdm;
-static SubscriberDataManager* remote_sdm;
-
-static IfcHandler* ifc_handler;
-
 static AnalyticsLogger* analytics_logger;
 
 static EnumService *enum_service;
@@ -1560,7 +1555,6 @@ static pj_status_t proxy_process_routing(pjsip_tx_data *tdata)
       // - remove the Route header,
       // - proceed as if it received this modified request.
       tdata->msg->line.req.uri = hroute->name_addr.uri;
-      target = tdata->msg->line.req.uri;
       pj_list_erase(hroute);
     }
   }
@@ -3198,10 +3192,7 @@ void UACTransaction::exit_context()
 ///@{
 // MODULE LIFECYCLE
 
-pj_status_t init_stateful_proxy(SubscriberDataManager* reg_sdm,
-                                SubscriberDataManager* reg_remote_sdm,
-                                IfcHandler* ifc_handler_in,
-                                pj_bool_t enable_edge_proxy,
+pj_status_t init_stateful_proxy(pj_bool_t enable_edge_proxy,
                                 const std::string& upstream_proxy_arg,
                                 int upstream_proxy_port,
                                 int upstream_proxy_connections,
@@ -3226,10 +3217,6 @@ pj_status_t init_stateful_proxy(SubscriberDataManager* reg_sdm,
   pj_status_t status;
 
   analytics_logger = analytics;
-  reg_sdm = sdm;
-  reg_remote_sdm = remote_sdm;
-
-  ifc_handler = ifc_handler_in;
 
   icscf = icscf_enabled;
   scscf = scscf_enabled;

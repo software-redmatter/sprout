@@ -2069,6 +2069,12 @@ int main(int argc, char* argv[])
   // Initialise the OPTIONS handling module.
   status = init_options();
 
+  if (status != PJ_SUCCESS)
+  {
+    TRC_ERROR("Failed to enable the OPTIONs module");
+    return 1;
+  }
+
   if (opt.hss_server != "")
   {
     // Create a connection to the HSS.
@@ -2132,10 +2138,7 @@ int main(int argc, char* argv[])
                 new ACRFactory();
 
     // Launch stateful proxy as P-CSCF.
-    status = init_stateful_proxy(NULL,
-                                 NULL,
-                                 NULL,
-                                 true,
+    status = init_stateful_proxy(true,
                                  opt.upstream_proxy,
                                  opt.upstream_proxy_port,
                                  opt.upstream_proxy_connections,

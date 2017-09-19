@@ -65,13 +65,11 @@ public:
     _chronos_connection = new FakeChronosConnection();
     _local_data_store = new LocalStore();
     _local_aor_store = new AstaireAoRStore(_local_data_store);
-    _sdm = new SubscriberDataManager((AoRStore*)_local_aor_store, _chronos_connection, NULL, true);
     _analytics = new AnalyticsLogger();
     _hss_connection = new FakeHSSConnection();
     if (ifcs)
     {
       _xdm_connection = new FakeXDMConnection();
-      _ifc_handler = new IfcHandler();
     }
     // We only test with a JSONEnumService, not with a DNSEnumService - since
     // it is stateful_proxy.cpp that's under test here, the EnumService
@@ -85,10 +83,7 @@ public:
     _scscf = scscf_enabled;
     _emerg_reg = emerg_reg_enabled;
     _acr_factory = new ACRFactory();
-    pj_status_t ret = init_stateful_proxy(_sdm,
-                                          NULL,
-                                          _ifc_handler,
-                                          !_edge_upstream_proxy.empty(),
+    pj_status_t ret = init_stateful_proxy(!_edge_upstream_proxy.empty(),
                                           _edge_upstream_proxy.c_str(),
                                           stack_data.pcscf_trusted_port,
                                           10,
@@ -122,12 +117,10 @@ public:
     pjsip_tsx_layer_destroy();
     destroy_stateful_proxy();
     delete _acr_factory; _acr_factory = NULL;
-    delete _sdm; _sdm = NULL;
     delete _chronos_connection; _chronos_connection = NULL;
     delete _local_aor_store; _local_aor_store = NULL;
     delete _local_data_store; _local_data_store = NULL;
     delete _analytics; _analytics = NULL;
-    delete _ifc_handler; _ifc_handler = NULL;
     delete _hss_connection; _hss_connection = NULL;
     delete _xdm_connection; _xdm_connection = NULL;
     delete _enum_service; _enum_service = NULL;
@@ -188,11 +181,9 @@ protected:
   static LocalStore* _local_data_store;
   static FakeChronosConnection* _chronos_connection;
   static AstaireAoRStore* _local_aor_store;
-  static SubscriberDataManager* _sdm;
   static AnalyticsLogger* _analytics;
   static FakeHSSConnection* _hss_connection;
   static FakeXDMConnection* _xdm_connection;
-  static IfcHandler* _ifc_handler;
   static EnumService* _enum_service;
   static BgcfService* _bgcf_service;
   static ACRFactory* _acr_factory;
@@ -219,11 +210,9 @@ protected:
 LocalStore* StatefulProxyTestBase::_local_data_store;
 FakeChronosConnection* StatefulProxyTestBase::_chronos_connection;
 AstaireAoRStore* StatefulProxyTestBase::_local_aor_store;
-SubscriberDataManager* StatefulProxyTestBase::_sdm;
 AnalyticsLogger* StatefulProxyTestBase::_analytics;
 FakeHSSConnection* StatefulProxyTestBase::_hss_connection;
 FakeXDMConnection* StatefulProxyTestBase::_xdm_connection;
-IfcHandler* StatefulProxyTestBase::_ifc_handler;
 EnumService* StatefulProxyTestBase::_enum_service;
 BgcfService* StatefulProxyTestBase::_bgcf_service;
 ACRFactory* StatefulProxyTestBase::_acr_factory;

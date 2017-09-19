@@ -294,12 +294,16 @@ static pj_bool_t on_ws_data(ws_transport *ws,
       sizeof(ws->rdata.pkt_info.src_name), 0);
   ws->rdata.pkt_info.src_port = pj_sockaddr_get_port(rem_addr);
 
-  const char *msg_str = msg->get_payload().c_str();
-  if (strlen(msg_str) <= PJSIP_MAX_PKT_LEN) {
-    ws->rdata.pkt_info.packet = (char*)pj_pool_alloc(ws->rdata.tp_info.pool, strlen(msg_str) + 1);
-    strcpy(ws->rdata.pkt_info.packet, msg_str);
-  } else {
-    TRC_ERROR("Dropping incoming websocket message as it is larger than PJSIP_MAX_PKT_LEN, %d", strlen(msg_str));
+  std::string msg_str = msg->get_payload();
+  if (strlen(msg_str.c_str()) <= PJSIP_MAX_PKT_LEN)
+  {
+    ws->rdata.pkt_info.packet = (char*)pj_pool_alloc(ws->rdata.tp_info.pool, strlen(msg_str.c_str()) + 1);
+    ws->rdata.pkt_info.packet = (char*)msg_str.c_str();
+  }
+  else
+  {
+    TRC_ERROR("Dropping incoming websocket message as it is larger than PJSIP_MAX_PKT_LEN, %d",
+              strlen(msg_str.c_str()));
     return PJ_FALSE;
   }
 
@@ -307,7 +311,7 @@ static pj_bool_t on_ws_data(ws_transport *ws,
   rdata = &ws->rdata;
 
   /* Init pkt_info part. */
-  rdata->pkt_info.len = strlen(msg_str);
+  rdata->pkt_info.len = strlen(msg_str.c_str());
   rdata->pkt_info.zero = 0;
   pj_gettimeofday(&rdata->pkt_info.timestamp);
 
